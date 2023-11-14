@@ -23,7 +23,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <pixman-config.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +46,15 @@ pixman_bool_t
 _pixman_addition_overflows_int (unsigned int a, unsigned int b)
 {
     return a > INT32_MAX - b;
+}
+
+void *
+pixman_malloc_ab_plus_c (unsigned int a, unsigned int b, unsigned int c)
+{
+    if (!b || a >= INT32_MAX / b || (a * b) > INT32_MAX - c)
+	return NULL;
+
+    return malloc (a * b + c);
 }
 
 void *
@@ -197,7 +206,7 @@ pixman_contract_from_float (uint32_t     *dst,
 
     for (i = 0; i < width; ++i)
     {
-	uint8_t a, r, g, b;
+	uint32_t a, r, g, b;
 
 	a = float_to_unorm (src[i].a, 8);
 	r = float_to_unorm (src[i].r, 8);
@@ -214,11 +223,22 @@ _pixman_iter_get_scanline_noop (pixman_iter_t *iter, const uint32_t *mask)
     return iter->buffer;
 }
 
+void
+_pixman_iter_init_bits_stride (pixman_iter_t *iter, const pixman_iter_info_t *info)
+{
+    pixman_image_t *image = iter->image;
+    uint8_t *b = (uint8_t *)image->bits.bits;
+    int s = image->bits.rowstride * 4;
+
+    iter->bits = b + s * iter->y + iter->x * PIXMAN_FORMAT_BPP (info->format) / 8;
+    iter->stride = s;
+}
+
 #define N_TMP_BOXES (16)
 
 pixman_bool_t
 pixman_region16_copy_from_region32 (pixman_region16_t *dst,
-                                    pixman_region32_t *src)
+                                    const pixman_region32_t *src)
 {
     int n_boxes, i;
     pixman_box32_t *boxes32;
@@ -248,7 +268,7 @@ pixman_region16_copy_from_region32 (pixman_region16_t *dst,
 
 pixman_bool_t
 pixman_region32_copy_from_region16 (pixman_region32_t *dst,
-                                    pixman_region16_t *src)
+                                    const pixman_region16_t *src)
 {
     int n_boxes, i;
     pixman_box16_t *boxes16;

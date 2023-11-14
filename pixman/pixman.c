@@ -24,7 +24,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include <pixman-config.h>
 #endif
 #include "pixman-private.h"
 
@@ -182,7 +182,7 @@ clip_general_image (pixman_region32_t * region,
 	    return FALSE;
 	}
     }
-    else if (!pixman_region32_not_empty (clip))
+    else if (pixman_region32_empty (clip))
     {
 	return FALSE;
     }
@@ -277,7 +277,7 @@ _pixman_compute_composite_region32 (pixman_region32_t * region,
 	{
 	    return FALSE;
 	}
-	if (!pixman_region32_not_empty (region))
+	if (pixman_region32_empty (region))
 	    return FALSE;
 	if (dest_image->common.alpha_map->common.have_clip_region)
 	{
@@ -325,18 +325,20 @@ _pixman_compute_composite_region32 (pixman_region32_t * region,
     return TRUE;
 }
 
-typedef struct
+typedef struct box_48_16 box_48_16_t;
+
+struct box_48_16
 {
-    pixman_fixed_48_16_t	x1;
-    pixman_fixed_48_16_t	y1;
-    pixman_fixed_48_16_t	x2;
-    pixman_fixed_48_16_t	y2;
-} box_48_16_t;
+    pixman_fixed_48_16_t        x1;
+    pixman_fixed_48_16_t        y1;
+    pixman_fixed_48_16_t        x2;
+    pixman_fixed_48_16_t        y2;
+};
 
 static pixman_bool_t
-compute_transformed_extents (pixman_transform_t *transform,
+compute_transformed_extents (pixman_transform_t   *transform,
 			     const pixman_box32_t *extents,
-			     box_48_16_t *transformed)
+			     box_48_16_t          *transformed)
 {
     pixman_fixed_48_16_t tx1, ty1, tx2, ty2;
     pixman_fixed_t x1, y1, x2, y2;
@@ -495,21 +497,12 @@ analyze_extent (pixman_image_t       *image,
     if (!compute_transformed_extents (transform, extents, &transformed))
 	return FALSE;
 
-    /* Expand the source area by a tiny bit so account of different rounding that
-     * may happen during sampling. Note that (8 * pixman_fixed_e) is very far from
-     * 0.5 so this won't cause the area computed to be overly pessimistic.
-     */
-    transformed.x1 -= 8 * pixman_fixed_e;
-    transformed.y1 -= 8 * pixman_fixed_e;
-    transformed.x2 += 8 * pixman_fixed_e;
-    transformed.y2 += 8 * pixman_fixed_e;
-
     if (image->common.type == BITS)
     {
-	if (pixman_fixed_to_int (transformed.x1) >= 0			&&
-	    pixman_fixed_to_int (transformed.y1) >= 0			&&
-	    pixman_fixed_to_int (transformed.x2) < image->bits.width	&&
-	    pixman_fixed_to_int (transformed.y2) < image->bits.height)
+	if (pixman_fixed_to_int (transformed.x1 - pixman_fixed_e) >= 0                &&
+	    pixman_fixed_to_int (transformed.y1 - pixman_fixed_e) >= 0                &&
+	    pixman_fixed_to_int (transformed.x2 - pixman_fixed_e) < image->bits.width &&
+	    pixman_fixed_to_int (transformed.y2 - pixman_fixed_e) < image->bits.height)
 	{
 	    *flags |= FAST_PATH_SAMPLES_COVER_CLIP_NEAREST;
 	}
@@ -605,7 +598,7 @@ pixman_image_composite32 (pixman_op_t      op,
     else
     {
 	mask_format = PIXMAN_null;
-	info.mask_flags = FAST_PATH_IS_OPAQUE;
+	info.mask_flags = FAST_PATH_IS_OPAQUE | FAST_PATH_NO_ALPHA_MAP;
     }
 
     dest_format = dest->common.extended_format_code;
@@ -783,6 +776,11 @@ color_to_pixel (const pixman_color_t *color,
                 pixman_format_code_t  format)
 {
     uint32_t c = color_to_uint32 (color);
+
+    if (PIXMAN_FORMAT_TYPE (format) == PIXMAN_TYPE_RGBA_FLOAT)
+    {
+	return FALSE;
+    }
 
     if (!(format == PIXMAN_a8r8g8b8     ||
           format == PIXMAN_x8r8g8b8     ||
@@ -1022,6 +1020,7 @@ pixman_format_supported_source (pixman_format_code_t format)
     case PIXMAN_x2r10g10b10:
     case PIXMAN_a8r8g8b8:
     case PIXMAN_a8r8g8b8_sRGB:
+    case PIXMAN_r8g8b8_sRGB:
     case PIXMAN_x8r8g8b8:
     case PIXMAN_a8b8g8r8:
     case PIXMAN_x8b8g8r8:

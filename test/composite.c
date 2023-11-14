@@ -92,6 +92,7 @@ static const pixman_format_code_t formats[] =
     
     /* sRGB formats */
     PIXMAN_a8r8g8b8_sRGB,
+    PIXMAN_r8g8b8_sRGB,
 
     /* 24 bpp formats */
     PIXMAN_r8g8b8,
@@ -296,17 +297,6 @@ composite_test (image_t *dst,
 	else
 	{
 	    round_color (mask->format, &tmsk);
-	}
-    }
-
-    if (mask)
-    {
-	if (component_alpha && PIXMAN_FORMAT_R (mask->format) == 0)
-	{
-	    /* Ax component-alpha masks expand alpha into
-	     * all color channels.
-	     */
-	    tmsk.r = tmsk.g = tmsk.b = tmsk.a;
 	}
     }
 

@@ -58,6 +58,7 @@ cc_library(
             ],
             "@platforms//os:windows": [
                 "-mssse3",
+                "-DPIXMAN_API=__declspec(dllexport)",
             ],
             "@platforms//os:macos": [
             ],

@@ -1,6 +1,7 @@
 load(":register_tests.bzl", "register_pixman_tests")
 cc_library(
     name = "pixman_simd",
+    visibility = ["//visibility:public"],
     srcs = [
         "pixman/pixman-combine32.h",
         "pixman/pixman-compiler.h",

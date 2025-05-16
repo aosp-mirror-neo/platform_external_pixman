@@ -1,0 +1,67 @@
+package {
+    default_applicable_licenses: ["external_pixman_license"],
+}
+
+license {
+    name: "external_pixman_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-BSD-3-Clause",
+        "SPDX-license-identifier-MIT",
+    ],
+    license_text: [
+        "LICENSE",
+    ],
+}
+
+cc_library_static {
+    name: "pixman",
+    visibility: [
+        "//external/igt-gpu-tools",
+        "//external/cairo",
+    ],
+    srcs: [
+        "pixman/pixman-edge-accessors.c",
+        "pixman/pixman-access-accessors.c",
+        "pixman/pixman-access.c",
+        "pixman/pixman-arm.c",
+        "pixman/pixman-bits-image.c",
+        "pixman/pixman-combine-float.c",
+        "pixman/pixman-combine32.c",
+        "pixman/pixman-conical-gradient.c",
+        "pixman/pixman-fast-path.c",
+        "pixman/pixman-general.c",
+        "pixman/pixman-gradient-walker.c",
+        "pixman/pixman-image.c",
+        "pixman/pixman-implementation.c",
+        "pixman/pixman-linear-gradient.c",
+        "pixman/pixman-matrix.c",
+        "pixman/pixman-mips.c",
+        "pixman/pixman-noop.c",
+        "pixman/pixman-ppc.c",
+        "pixman/pixman-radial-gradient.c",
+        "pixman/pixman-region16.c",
+        "pixman/pixman-region32.c",
+        "pixman/pixman-solid-fill.c",
+        "pixman/pixman-utils.c",
+        "pixman/pixman-x86.c",
+        "pixman/pixman.c",
+        "pixman/pixman-riscv.c",
+        "pixman/pixman-trap.c",
+        "pixman/pixman-glyph.c",
+        "pixman/pixman-edge.c",
+    ],
+    local_include_dirs: [
+        "pixman",
+    ],
+    export_include_dirs: ["pixman"],
+    cflags: [
+        "-D_USE_MATH_DEFINES",
+        "-DTLS=__thread",
+        "-DPACKAGE=\"android-pixman\"",
+        "-Wno-unused-parameter",
+        "-Wno-missing-field-initializers",
+        "-Wno-unused-const-variable",
+        "-Wno-unused-local-typedef",
+    ],
+}

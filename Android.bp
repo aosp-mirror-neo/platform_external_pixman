@@ -14,6 +14,17 @@ license {
     ],
 }
 
+// version : '0.44.2' from meson.build:24
+genrule {
+    name: "pixman-version_gen",
+    cmd: "sed -e 's/@PIXMAN_VERSION_MAJOR@/0/g' " +
+        "-e 's/@PIXMAN_VERSION_MINOR@/44/g' " +
+        "-e 's/@PIXMAN_VERSION_MICRO@/2/g' " +
+        "$(in) > $(out)",
+    srcs: ["pixman/pixman-version.h.in"],
+    out: ["pixman-version.h"],
+}
+
 cc_library_static {
     name: "pixman",
     visibility: [
@@ -51,16 +62,17 @@ cc_library_static {
         "pixman/pixman-glyph.c",
         "pixman/pixman-edge.c",
     ],
-    local_include_dirs: [
-        "pixman",
-    ],
+    local_include_dirs: ["pixman"],
     export_include_dirs: ["pixman"],
+    generated_headers: ["pixman-version_gen"],
+    export_generated_headers: ["pixman-version_gen"],
     cflags: [
         "-D_USE_MATH_DEFINES",
         "-DTLS=__thread",
         "-DPACKAGE=\"android-pixman\"",
         "-Wno-unused-parameter",
         "-Wno-missing-field-initializers",
+        "-Wno-unknown-attributes",
         "-Wno-unused-const-variable",
         "-Wno-unused-local-typedef",
     ],

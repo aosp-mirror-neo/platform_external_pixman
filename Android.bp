@@ -30,6 +30,7 @@ cc_library_static {
     visibility: [
         "//external/igt-gpu-tools",
         "//external/cairo",
+        "//vendor:__subpackages__",
     ],
     srcs: [
         "pixman/pixman-edge-accessors.c",

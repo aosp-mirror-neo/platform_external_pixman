@@ -874,7 +874,7 @@ struct pixman_indexed
 	 PIXMAN_FORMAT_TYPE(f) == PIXMAN_TYPE_RGBA ||	\
 	 PIXMAN_FORMAT_TYPE(f) == PIXMAN_TYPE_RGBA_FLOAT)
 
-typedef enum {
+typedef enum : uint32_t {
 /* 128bpp formats */
     PIXMAN_rgba_float =	PIXMAN_FORMAT_BYTE(128,PIXMAN_TYPE_RGBA_FLOAT,32,32,32,32),
 /* 96bpp formats */

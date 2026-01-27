@@ -16,7 +16,8 @@ third_party {
   identifier {
     type: "Git"
     value: "https://gitlab.freedesktop.org/pixman/pixman"
-    version: "pixman-0.44.2"
+    version: "ea266e6de6d4918c4c9739fb76cbebce68264d45"
+    closest_version: "pixman-0.44.2"
     primary_source: true
   }
 }

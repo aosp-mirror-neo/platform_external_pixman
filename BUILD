@@ -1,7 +1,24 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_license//rules:license.bzl", "license")
 load(":register_tests.bzl", "register_pixman_tests")
+
+package(
+    default_applicable_licenses = [":license"],
+)
+
+license(
+    name = "license",
+    package_name = "pixman",
+    license_kinds = ["@rules_license//licenses/spdx:MIT"],
+    license_text = "COPYING",
+    package_url = "https://www.pixman.org/",
+    visibility = ["//visibility:public"],
+)
+
+exports_files(["COPYING"])
+
 cc_library(
     name = "pixman_simd",
-    visibility = ["//visibility:public"],
     srcs = [
         "pixman/pixman-combine32.h",
         "pixman/pixman-compiler.h",
@@ -80,6 +97,7 @@ cc_library(
             "//conditions:default": [],
         },
     ),
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -175,11 +193,11 @@ cc_library(
 cc_library(
     name = "pixman-test-utils",
     srcs = [
+        "pixman/config.h",
         "test/utils.c",
         "test/utils.h",
         "test/utils-prng.c",
         "test/utils-prng.h",
-        "pixman/config.h",
     ],
     copts = [
         "-DHAVE_CONFIG_H",
@@ -189,9 +207,8 @@ cc_library(
     deps = [":pixman-1"],
 )
 
-
- # Commented out ones need png version of utils, which we do not yet have
-register_pixman_tests(tests=[
+# Commented out ones need png version of utils, which we do not yet have
+register_pixman_tests(tests = [
     "a1-trap-test",
     "alpha-loop",
     "combiner-test",

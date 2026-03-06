@@ -9,6 +9,7 @@ package(
 license(
     name = "license",
     package_name = "pixman",
+    copyright_notice = "Copyright 1987, 1988, 1989, 1998  The Open Group",
     license_kinds = ["@rules_license//licenses/spdx:MIT"],
     license_text = "COPYING",
     package_url = "https://www.pixman.org/",
